@@ -4,6 +4,7 @@ Functions to automate ML pipeline
 import datetime as dt
 import pandas as pd
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from IPython.display import display
 
@@ -11,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import ParameterGrid
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
+
 
 def read_data(path):
     '''
@@ -23,6 +25,7 @@ def read_data(path):
         df: A pandas dataframe
     '''
     return pd.read_csv(path)
+
 
 def explore_df(df):
     '''
@@ -75,6 +78,7 @@ def explore_df_summary_stats(df):
             print("\nColumn: {}".format(col))
             print("Min value: {:,}".format(min_val))
 
+
 def explore_df_sample(df):
     '''
     Given a dataframe, print the types of each column, along with several
@@ -95,6 +99,7 @@ def explore_df_sample(df):
     print("First five rows of dataframe:")
     display(df.head())
 
+
 def explore_correlations(df):
     '''
     Display the correlations between the features in tabular and graphical
@@ -113,6 +118,7 @@ def explore_correlations(df):
 
     print("Plot displaying correlations (brighter box = higher correlation):")
     plt.matshow(df_corrs)
+
 
 def explore_time_series(df, date_col, y_var_col, count_plot=True, xlabel=None,
                         ylabel=None, xlim=None, ylim=None, title=None,
@@ -145,6 +151,7 @@ def explore_time_series(df, date_col, y_var_col, count_plot=True, xlabel=None,
     ax.set(xlabel=xlabel, ylabel=ylabel, xlim=xlim, ylim=ylim)
     ax.set_title(label=title, fontsize=title_font);
 
+
 def create_train_test_split(df, test_size=0.2, train_size=None,
                             random_state=100, shuffle=True):
     '''
@@ -168,6 +175,7 @@ def create_train_test_split(df, test_size=0.2, train_size=None,
                                          shuffle=shuffle)
 
     return df_train, df_test
+
 
 def impute_missing_values(df, impute_col, df_to_impute_from=None,
                           missing_value_list=None):
@@ -202,6 +210,7 @@ def impute_missing_values(df, impute_col, df_to_impute_from=None,
                                                 value=col_median)
 
     return df[impute_col]
+
 
 def normalize(df, cols, scaler=None):
     '''
@@ -284,6 +293,7 @@ def one_hot_encode(df, cols_to_encode, prefix_sep="__", train_dummy_cols=None,
          and col.split("__")[0] in cols_to_encode], \
         list(df_with_dummies.columns[:])
 
+
 def discretize_feature(col, bins, labels, include_lowest=True,
                        right=True):
     '''
@@ -302,6 +312,7 @@ def discretize_feature(col, bins, labels, include_lowest=True,
     '''
     return pd.cut(col, bins=bins, labels=labels, include_lowest=include_lowest,
                   right=right)
+
 
 def build_model(features, target, model, params=None):
     '''
@@ -333,6 +344,7 @@ def build_model(features, target, model, params=None):
 
     return fitted_model
 
+
 def evaluate_classifier_accuracy(fitted_model, test_features, test_target):
     '''
     Calculate the accuracy of a model based on a test set
@@ -351,6 +363,27 @@ def evaluate_classifier_accuracy(fitted_model, test_features, test_target):
 
     return accuracy_score(test_target,
                           fitted_model.predict(test_features))
+
+
+def root_mean_squared_error(true_y, predicted_y):
+    '''
+    Calculated root mean-squared error
+    '''
+    return math.sqrt(np.sum((true_y - predicted_y)**2) / len(true_y))
+
+
+def classification_err(y_true, y_hat):
+    '''
+    Calculate classification error
+
+    Inputs:
+        y_true: 1d numpy array with true target values
+        y_hat: 1d numpy array with predicted target values
+    '''
+    y_hat = np.sign(y_hat).reshape(-1)
+    test_matches = np.equal(y_hat, y_true.reshape(-1))
+    return (y_hat.size - np.sum(test_matches))/y_hat.size
+
 
 def perform_grid_search(models, param_grid, train_features, train_target,
                         test_features, test_target):
@@ -403,6 +436,7 @@ def perform_grid_search(models, param_grid, train_features, train_target,
 
     return results_df
 
+
 # Get the best model from the grid above
 def retrain_best_grid_model(grid_df, features, target):
     '''
@@ -413,6 +447,7 @@ def retrain_best_grid_model(grid_df, features, target):
 
     '''
     return []
+
 
 def create_coefficient_df(fitted_model, train_features):
     '''
