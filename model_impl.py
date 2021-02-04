@@ -1,9 +1,9 @@
 '''
 Model implementations to use during training process
 
-Note: this code was made as part of a Machine Learning course, where the focus
+Note: this code was written as part of an ML course, where the focus
 was on learning the mathematical foundations of common ML models. On this
-project we were instructed to write our own implementations of these models,
+project we were encouraged to write our own implementations of these models,
 when possible. (In practice this meant writing code to implement ridge and
 principal components regression, but using sk-learn to implement an SVM.)
 '''
@@ -40,10 +40,3 @@ def estimate_weights_using_svd(v, s, u_t, y, sing_vals_to_keep=None,
     # Ordinary least squares
     s_inv = la.pinv(s)
     return v @ s_inv @ u_t @ y
-
-
-def root_mean_squared_error(true_y, predicted_y):
-    '''
-    Calculated root mean-squared error
-    '''
-    return math.sqrt(np.sum((true_y - predicted_y)**2) / len(true_y))
