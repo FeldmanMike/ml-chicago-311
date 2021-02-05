@@ -437,18 +437,6 @@ def perform_grid_search(models, param_grid, train_features, train_target,
     return results_df
 
 
-# Get the best model from the grid above
-def retrain_best_grid_model(grid_df, features, target):
-    '''
-    Get best model from grid search
-
-    Inputs:
-        grid_df: Dataframe
-
-    '''
-    return []
-
-
 def create_coefficient_df(fitted_model, train_features):
     '''
     Return a pandas dataframe with a column with the feature names for a fitted

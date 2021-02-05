@@ -11,8 +11,7 @@ import math
 import numpy as np
 from numpy import linalg as la
 
-def estimate_weights_using_svd(v, s, u_t, y, sing_vals_to_keep=None,
-                               lamb=None, model='trunc_svd_ls'):
+def estimate_weights_using_svd(v, s, u_t, y, param=None, model='trunc_svd'):
     '''
     Estimate weights for regression model using the SVD
   
@@ -20,20 +19,19 @@ def estimate_weights_using_svd(v, s, u_t, y, sing_vals_to_keep=None,
         v, s, u: V, Sigma, and U transpose matrices found via
             the SVD on X
         y: vector of labels for X
-        sing_vals_to_keep: first n singular values to keep non-zero
-        lamb: ridge regularization parameter
+        param: Hyperparameter for model
         model: which model to estimated; options include 'trunc_svd_ls',
             'svd_ls', and 'ridge'
     '''
     # Ridge regression
     if model == 'ridge':
         I = np.identity(s.shape[0])
-        return v @ la.inv((s.T @ s) + (lamb * I)) @ s.T @ u_t @ y
+        return v @ la.inv((s.T @ s) + (param * I)) @ s.T @ u_t @ y
 
     # Principal components regression
-    if model == 'trunc_svd_ls':
+    if model == 'trunc_svd':
         s_trunc = np.copy(s)
-        s_trunc[:, sing_vals_to_keep:] = 0
+        s_trunc[:, param:] = 0
         s_inv = la.pinv(s_trunc)
         return v @ s_inv @ u_t @ y
 
