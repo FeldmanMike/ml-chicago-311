@@ -12,12 +12,12 @@ we would have also tried logistic regression, Naive Bayes, and random forest
 classifiers.
 '''
 import pandas as pd
-import pipeline as pl
 import numpy as np
 import pickle
 from numpy import linalg as la
 from sklearn.svm import LinearSVC
 from model_impl import estimate_weights_using_svd
+import pipeline as pl
 
 MODEL_PARAMS_REGR = {
         'ridge': [0, 1, 5, 10, 15, 20, 25, 50, 75, 100, 1000, 10000],
@@ -185,15 +185,42 @@ def go():
     results_df_clsf = calc_model_performance(MODEL_PARAMS_CLSF, v_t.T,
                                              np.diag(s), u.T, train_targ_clsf,
                                              val_feat, val_targ_clsf,
-                                             task='class')
+                                             task='clsf')
 
     print('Best model for classification is...', best_model_clsf)
     print('Its hyperparameter is...', best_param_clsf)
+    print('Retraining best model to pickle and calc test error...')
+    if best_model_clsf == 'svm_linear':
+        svc = LinearSVC(C=best_param_clsf)
+        svc.fit(train_feat, train_targ_clsf.reshape(-1))
+        best_weights_clsf = None
+        model_obj = svc
+        test_error_clsf = pl.classification_err(test_targ_clsf,
+                                                svc.predict(test_feat))
+    else:
+        best_weights_clsf = estimate_weights_using_svd(v_t.T, np.diag(s), u.T,
+                                                       train_targ_clsf,
+                                                       param=best_param_clsf,
+                                                       model=best_model_clsf)
+        model_obj = None
+        test_error_clsf = pl.classification_err(test_targ_clsf,
+                                                test_feat @ best_weights_clsf)
 
-    # TODO Next - retrain best classification model and send to pickle
-    print('Its test error is...',)
-    
+    print('Its test error is...', test_error_clsf)
+
+    clsf_model_info = {
+        'model_task': 'clsf',
+        'model_type': best_model_clsf,
+        'model_obj': model_obj,
+        'model_weights': best_weights_clsf,
+        'model_test_error': test_error_clsf
+    }
+
     print('Sending to pickle...')
+    with open('pickle_files/best_clsf_model.pkl', 'wb') as f:
+        pickle.dump(clsf_model_info, f)
+    
+    print('Done!')
 
     
 if __name__ == '__main__':
