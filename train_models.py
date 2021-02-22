@@ -9,7 +9,7 @@ encouraged to prioritize implementing models that were focused on.
 Due to these instructions and time constraints, we were not exhaustive in our
 model selection process below. If we had more time and computational resources,
 we would have also tried logistic regression, Naive Bayes, and random forest
-classifiers.
+classifiers, as well as some polynomial feature transformations.
 '''
 import pandas as pd
 import numpy as np
@@ -52,43 +52,53 @@ def calc_model_performance(model_params, v, s, u_t, train_targ, val_feat,
             model, and pandas DataFrame with model, hyperparameter, and
             validation error,sorted from lowest to highest validation error
     '''
-    results = np.zeros((len(model_params), 4))
+    # results = np.zeros((len(model_params), 4))
+    results = {
+        'model': [],
+        'hyperparam': [],
+        'task': [],
+        'validation_err': []
+    }
     train_feat = u_t.T @ s @ v.T
 
-    i = 0
-    for model, param in model_params.items():
-        results[i, 1] = model
-        results[i, 2] = param
-        results[i, 3] = task
+    for model, param_list in model_params.items():
+        for param in param_list:
+            # results[i, 1] = model
+            # results[i, 2] = param
+            # results[i, 3] = task
+            results['model'].append(model)
+            results['hyperparam'].append(param)
+            results['task'].append(task)
 
-        print('Estimating training weights for...', model)
-        print('Hyperparam is...', param)
-        if model in ['ridge', 'trunc_svd']:
-            weights = estimate_weights_using_svd(v, s, u_t, train_targ,
-                                                 param=param, model=model)
+            print('Estimating training weights for...', model)
+            print('Hyperparam is...', param)
+            if model in ['ridge', 'trunc_svd']:
+                weights = estimate_weights_using_svd(v, s, u_t, train_targ,
+                                                     param=param, model=model)
 
-            print('Evaluating performance...')
-            if task == 'regr':
-                results[i, 3] = pl.root_mean_squared_error(val_targ,
-                                                           val_feat @ weights)
-            if task == 'clsf':
-                results[i, 3] = pl.classification_err(val_targ,
-                                                      val_feat @ weights)
+                print('Evaluating performance...')
+                if task == 'regr':
+                    results['validation_err'].append(pl.root_mean_squared_error(
+                                                        val_targ,
+                                                        val_feat @ weights))
+                if task == 'clsf':
+                    results['validation_err'].append(pl.classification_err(
+                                                         val_targ,
+                                                         val_feat @ weights))
 
-        elif model == 'svm_linear' and task == 'clsf':
-            svc = LinearSVC(C=param)
-            svc.fit(train_feat, train_targ.reshape(-1))
+            elif model == 'svm_linear' and task == 'clsf':
+                svc = LinearSVC(C=param)
+                svc.fit(train_feat, train_targ.reshape(-1))
 
-            print('Evaluating performance...')
-            results[i, 4] = pl.classification_err(val_targ,
-                                                  svc.predict(val_feat))
+                print('Evaluating performance...')
+                results['validation_err'].append(pl.classification_err(val_targ,
+                                                     svc.predict(val_feat)))
 
     print('Converting results to sorted dataframe...')
-    results_df = pd.DataFrame(data=results,
-                              columns=['model',
-                                       'hyporparam',
-                                       'validation_err']).sort.values(
-                                        by=['validation_err'], inplace=True)
+    # TODO - what if we test an uneven # of params -- how do we coerce into
+    # dataframe then with uneven number of rows per param?
+    results_df = pd.DataFrame(data=results).sort_values(
+                        by=['validation_err'], inplace=True)
 
     best_model = results_df.loc[0, 'model']
     best_model_param = results_df.loc[0, 'hyperparam']
@@ -102,7 +112,7 @@ def go():
     '''
     # Read in dataframe from pickle file
     print('Reading in pickle data file...')
-    chi_311 = pd.read_pickle("../pickle_files/chi_311.pkl")
+    chi_311 = pd.read_pickle("./pickle_files/chi_311.pkl")
 
     # Split into train and test sets (80/20) using random seed (which is
     # defined in the wrapper function)
