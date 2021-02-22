@@ -54,6 +54,12 @@ def clean_311_data():
     chi_311_filtered = chi_311_filtered.drop(columns=['DUPLICATE',
                                                       'PARENT_SR_NUMBER'])
 
+    print('Make dummy columns...')
+    chi_311_filtered = pd.get_dummies(chi_311_filtered,
+                                      columns=['WARD', 'CREATED_HOUR', 
+                                               'CREATED_DAY_OF_WEEK',
+                                               'CREATED_MONTH', 'SR_TYPE'])
+
     # Filter out requests resolved in less than 10 minutes (i.e., requests that
     # don't require someone dispatched to solve).
 
@@ -98,12 +104,14 @@ def clean_311_data():
     print('Filter out uncompleted...')
     chi_311_filtered = chi_311_filtered[chi_311_filtered['STATUS'] ==
                                         'Completed']
-
+    
     # Drop other unneeded columns
     print('Drop unneeded columns...')
     chi_311_filtered = chi_311_filtered.drop(columns=['STATUS', 'CREATED_DATE',
                                                       'CLOSED_DATE',
                                                       'time_to_close_sec'])
+
+    print('Columns are now...', chi_311_filtered.columns)
 
     # Fill NAs as needed
     print('Fill NAs as needed...')
