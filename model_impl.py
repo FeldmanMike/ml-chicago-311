@@ -26,6 +26,13 @@ def estimate_weights_using_svd(v, s, u_t, y, param=None, model='trunc_svd'):
     # Ridge regression
     if model == 'ridge':
         I = np.identity(s.shape[0])
+        # print('Dimensions of v are...', v.shape)
+        # print('Dimensions of s are...', s.shape)
+        # print('Dimensions of pseudo-s plus are...', la.inv((s.T @ s) + (param *
+        #     I)).shape)
+        # print('Dimensions of s.T are...', s.T.shape)
+        # print('Dimensions of u.T are...', u_t.shape)
+        # print('Dimensions of y are...', y.shape)
         return v @ la.inv((s.T @ s) + (param * I)) @ s.T @ u_t @ y
 
     # Principal components regression
