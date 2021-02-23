@@ -21,12 +21,12 @@ import pipeline as pl
 
 MODEL_PARAMS_REGR = {
         'ridge': [0, 1, 5, 10, 15, 20, 25, 50, 75, 100, 1000, 10000],
-        'trunc_svc': [1, 2, 5, 10, 50, 75, 100, 125, 150, 175, 189]
+        'trunc_svd': [1, 2, 5, 10, 50, 75, 100, 125, 150, 175, 189]
         }
 
 MODEL_PARAMS_CLSF = {
         'ridge': [0, 1, 5, 10, 15, 20, 25, 50, 75, 100, 1000, 10000],
-        'trunc_svc': [1, 2, 5, 10, 50, 75, 100, 125, 150, 175, 189],
+        'trunc_svd': [1, 2, 5, 10, 50, 75, 100, 125, 150, 175, 189],
         'svm_linear': [1, 10, 100, 1000]
         }
 
@@ -95,10 +95,10 @@ def calc_model_performance(model_params, v, s, u_t, train_targ, val_feat,
                                                      svc.predict(val_feat)))
 
     print('Converting results to sorted dataframe...')
-    # TODO - what if we test an uneven # of params -- how do we coerce into
-    # dataframe then with uneven number of rows per param?
     results_df = pd.DataFrame(data=results).sort_values(
-                        by=['validation_err'], inplace=True)
+                        by=['validation_err'], ignore_index=True)
+
+    print('Results dataframe is...', results_df)
 
     best_model = results_df.loc[0, 'model']
     best_model_param = results_df.loc[0, 'hyperparam']
@@ -199,7 +199,7 @@ def go():
 
     print('Best model for classification is...', best_model_clsf)
     print('Its hyperparameter is...', best_param_clsf)
-    print('Retraining best model to pickle and calc test error...')
+    print('Retraining best model and calculating test error...')
     if best_model_clsf == 'svm_linear':
         svc = LinearSVC(C=best_param_clsf)
         svc.fit(train_feat, train_targ_clsf.reshape(-1))
