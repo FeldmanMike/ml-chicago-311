@@ -1,5 +1,5 @@
 '''
-Train models and find model with best performance on validation set
+Train models and find model with best performance on validation set.
 
 Note: this code was written as part of an ML course, where the focus
 was on learning the mathematical foundations of common ML models. The goal of
