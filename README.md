@@ -11,7 +11,7 @@ into how the time-to-complete estimate is generated or how accurate it may be,
 beyond a statement that the “estimated completion time may vary depending on
 request volume, time of year, and other factors.”
 
-In this project, we have trained models that (1) estimate the time needed to
+In this project, we have trained models that estimate (1) the time needed to
 complete a 311 request, and (2) whether a request will be completed within a
 one-week timeframe.
 
