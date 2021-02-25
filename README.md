@@ -1,5 +1,5 @@
 # When Will They Fix It?
-### Predicting 311 Response Times in Chicago
+## Predicting 311 Response Times in Chicago
 
 [Chicago 311](https://311.chicago.gov/s/?language=en_US) is the city-run phone
 and web service where Chicago residents can place non-emergency requests
