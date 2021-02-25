@@ -28,8 +28,8 @@ components regression models.
 
 __train_models.py__ splits the processed data into train, validation, and test
 sets, and runs a grid search over pre-selected models and hyperparameters to
-identify the best models for both the regression and classification tasks
-(identified in the introduction). The best models, along with their associated
+identify the best models for the regression and classification tasks
+identified in the introduction. The best models, along with their associated
 test error, are saved to __best_regr_model.pkl__ and __best_clsf_model.pkl__.
 
 The __pickle_files__ folder includes the processed data that is the input to
